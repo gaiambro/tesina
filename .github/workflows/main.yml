@@ -19,7 +19,7 @@ jobs:
 
       - name: Convert Document with Pandoc
         run: |
-          pandoc tesina.md -o tesina.pdf
+          pandoc tesina.md -o tesina.docx
           
       - name: Create Release
         id: create_release
