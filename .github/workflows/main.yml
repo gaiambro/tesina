@@ -1,32 +1,45 @@
-name: Pandoc Workflow
+name: Main
 
 on:
   push:
-    tags:
-      - '*'
+    paths:
+      - tesina.md
+      
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Get Italy Time
+        id: italy_time
+        run: |
+          TZ="Europe/Rome"  # Set the time zone to Italy
+          ITALY_TIME=$(date "+%Y-%m-%d-%H-%M-%S")
+          echo "::set-output name=italy_time::$ITALY_TIME"
 
       - name: Install Pandoc
         run: |
           wget https://github.com/jgm/pandoc/releases/download/2.14/pandoc-2.14-1-amd64.deb
           sudo dpkg -i pandoc-2.14-1-amd64.deb
-        # Replace the URL with the appropriate Pandoc version for your needs
-
-      - name: Convert Document with Pandoc
+      - name: Create dist dir
         run: |
-          pandoc tesina.md -o tesina.docx
-          
-      - name: Create Release
-        id: create_release
+          mkdir ./dist
+      - name: Generate tesina.docx
+        run: |
+          out_name="./dist/tesina-${{ steps.italy_time.outputs.italy_time }}.docx"
+          pandoc tesina.md -o ${out_name}
+      - name: Add other files to dist
+        run: |
+          out_name="./dist/tesina-${{ steps.italy_time.outputs.italy_time }}.md"
+          mv tesina.md ${out_name}
+        shell: bash
+      - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ./tesina.docx
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          files: ./dist/*
+          tag_name: ${{ steps.italy_time.outputs.italy_time }}
+          name: ${{ steps.italy_time.outputs.italy_time }}
