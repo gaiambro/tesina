@@ -1,4 +1,4 @@
-# un tocco di luce
+# Un tocco di luce
 
 # La storia
 
