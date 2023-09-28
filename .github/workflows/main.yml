@@ -2,6 +2,8 @@ name: Pandoc Workflow
 
 on:
   push:
+    tags:
+      - '*'
 
 jobs:
   build:
